@@ -1,0 +1,22 @@
+apiVersion: console.openshift.io/v1
+kind: ConsoleYAMLSample
+metadata:
+  name: pipeline-topology-connected-sample
+spec:
+  targetResource:
+    apiVersion: tekton.dev/v1alpha1
+    kind: Pipeline
+  title: Pipeline + Topology Connected Sample
+  description: An example of a pipeline connecting to a workload
+  yaml: |
+    apiVersion: tekton.dev/v1alpha1
+    kind: Pipeline
+    metadata:
+      name: hello-world-pipeline
+      labels:
+        "app.kubernetes.io/instance": "react-web-app"
+    spec:
+      tasks:
+        - name: hello-world
+          taskRef:
+            name: hello-world

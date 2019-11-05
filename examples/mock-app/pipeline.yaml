@@ -1,0 +1,25 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: mock-app-pipeline
+spec:
+  tasks:
+    - name: install-deps
+      taskRef:
+        name: install-dependencies
+    - name: code-sanity
+      taskRef:
+        name: lint-and-test
+      runAfter:
+        - install-deps
+    - name: compile
+      taskRef:
+        name: build-dist
+      runAfter:
+        - install-deps
+    - name: e2e-tests
+      taskRef:
+        name: run-e2e-tests
+      runAfter:
+        - code-sanity
+        - compile

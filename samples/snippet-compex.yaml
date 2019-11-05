@@ -1,0 +1,27 @@
+apiVersion: console.openshift.io/v1
+kind: ConsoleYAMLSample
+metadata:
+  name: pipeline-complex-snippet
+spec:
+  targetResource:
+    apiVersion: tekton.dev/v1alpha1
+    kind: Pipeline
+  title: Complex Task
+  description: An example of a complex task snippet
+  snippet: true
+  yaml: |
+    - name: build-skaffold-web
+      taskRef:
+        name: build-docker-image-from-git-source
+      params:
+        - name: pathToDockerFile
+          value: Dockerfile
+        - name: pathToContext
+          value: /workspace/docker-source/examples/microservices/leeroy-web
+      resources:
+        inputs:
+          - name: docker-source
+            resource: source-repo
+        outputs:
+          - name: builtImage
+            resource: web-image

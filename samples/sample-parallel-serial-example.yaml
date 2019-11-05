@@ -1,0 +1,38 @@
+apiVersion: console.openshift.io/v1
+kind: ConsoleYAMLSample
+metadata:
+  name: pipeline-parallel-serial-sample
+spec:
+  targetResource:
+    apiVersion: tekton.dev/v1alpha1
+    kind: Pipeline
+  title: Parallel and Serial Pipeline Sample
+  description: An example of a pipeline with parallel and serial tasks
+  yaml: |
+    apiVersion: tekton.dev/v1alpha1
+    kind: Pipeline
+    metadata:
+      name: echo-chain-pipeline
+      labels:
+        "app.kubernetes.io/instance": "nodejs-rest-http"
+    spec:
+      tasks:
+        - name: echo-first
+          taskRef:
+            name: echo-1
+        - name: echo-second
+          taskRef:
+            name: echo-2
+          runAfter:
+            - echo-first
+        - name: echo-third-a
+          taskRef:
+            name: echo-3
+          runAfter:
+            - echo-second
+        - name: echo-third-b
+          taskRef:
+            name: echo-4
+          runAfter:
+            - echo-second
+
