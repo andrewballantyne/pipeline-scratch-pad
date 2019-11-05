@@ -6,8 +6,8 @@ Created in the hopes to mark down the various templates and thoughts around usin
 
 ## Sections
 
-1. [Examples](examples/README.md)
-1. [Snippets & Samples](samples/README.md)
+1. [Examples](examples)
+1. [Snippets & Samples](samples)
 
 ## Prerequisites
 
