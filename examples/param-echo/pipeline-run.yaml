@@ -1,0 +1,10 @@
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineRun
+metadata:
+  name: custom-echo-pipeline-run
+spec:
+  params:
+    - name: echo-value
+      value: my pipeline run value
+  pipelineRef:
+    name: custom-echo-pipeline

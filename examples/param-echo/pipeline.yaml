@@ -1,0 +1,16 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: custom-echo-pipeline
+spec:
+  params:
+    - name: echo-value
+      description: The value to echo out
+      default: pipeline echo value
+  tasks:
+    - name: echo
+      taskRef:
+        name: echo-task
+      params:
+        - name: echo-value-for-task
+          value: "$(params.echo-value)"
