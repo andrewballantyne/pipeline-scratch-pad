@@ -1,0 +1,31 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: docker-cluster-pipeline
+  labels:
+    pipeline.openshift.io/strategy: docker
+spec:
+  tasks:
+    - name: install-deps
+      taskRef:
+        name: cluster-install-dependencies
+        kind: ClusterTask
+    - name: code-sanity
+      taskRef:
+        name: cluster-lint-and-test
+        kind: ClusterTask
+      runAfter:
+        - install-deps
+    - name: compile
+      taskRef:
+        name: cluster-build-dist
+        kind: ClusterTask
+      runAfter:
+        - install-deps
+    - name: e2e-tests
+      taskRef:
+        name: cluster-run-e2e-tests
+        kind: ClusterTask
+      runAfter:
+        - code-sanity
+        - compile
