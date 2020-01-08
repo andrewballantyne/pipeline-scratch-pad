@@ -1,0 +1,11 @@
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineRun
+metadata:
+  name: service-account-plr
+spec:
+  params:
+    - name: echo-value
+      value: my pipeline run value
+  pipelineRef:
+    name: service-account-pl
+  serviceAccount: pipeline
