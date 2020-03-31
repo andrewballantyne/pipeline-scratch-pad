@@ -1,0 +1,115 @@
+apiVersion: tekton.dev/v1alpha1
+kind: TriggerBinding
+metadata:
+  name: generic-git
+spec:
+  params:
+    - name: gitrevision
+      value: $(body.head_commit.id)
+    - name: gitrepositoryurl
+      value: $(body.repository.url)
+    - name: contenttype
+      value: $(header.Content-Type)
+---
+apiVersion: tekton.dev/v1alpha1
+kind: TriggerTemplate
+metadata:
+  name: pipeline-template
+spec:
+  params:
+    - name: gitrevision
+      description: The git revision
+      default: master
+    - name: gitrepositoryurl
+      description: The git repository url
+    - name: message
+      description: The message to print
+      default: This is the default message
+    - name: contenttype
+      description: The Content-Type of the event
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1alpha1
+      kind: PipelineRun
+      metadata:
+        generateName: simple-pipeline-run
+      spec:
+        pipelineRef:
+          name: simple-pipeline
+        params:
+          - name: url
+            value: $(params.gitrepositoryurl)
+          - name: content-type
+            value: $(params.contenttype)
+          - name: reference
+            value: "$(params.message) ($(params.gitrevision))"
+---
+apiVersion: tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: event-listener
+spec:
+  triggers:
+    - name: trigger-1
+      bindings:
+        - name: generic-git
+      template:
+        name: pipeline-template
+---
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: simple-pipeline
+spec:
+  params:
+    - name: url
+      description: The url of the repo
+    - name: content-type
+      description: The content type of the event
+    - name: reference
+      description: The reference for this commit trigger
+  tasks:
+    - name: echo-event
+      taskRef:
+        name: echo-params-for-event
+      params:
+        - name: url
+          value: $(params.url)
+        - name: content-type
+          value: $(params.content-type)
+        - name: reference
+          value: $(params.reference)
+---
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: echo-params-for-event
+spec:
+  inputs:
+    params:
+      - name: url
+        description: The url of the repo
+      - name: content-type
+        description: The content type of the event
+      - name: reference
+        description: The reference for this commit trigger
+  steps:
+    - name: event-source
+      image: ubuntu
+      command:
+        - echo
+      args:
+        - "The git repo we are using is $(inputs.params.url)"
+    - name: event-metadata
+      image: ubuntu
+      command:
+        - echo
+      args:
+        - $(inputs.params.content-type)
+    - name: event-reference
+      image: ubuntu
+      command:
+        - echo
+      args:
+        - "Commit: $(inputs.params.reference)"
+---
+
