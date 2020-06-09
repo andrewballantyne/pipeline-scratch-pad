@@ -4,6 +4,7 @@ A series of disjointed Tekton Pipeline Items
 
 Created in the hopes to mark down the various templates and thoughts around using the Tekton Pipeline Operator in an OpenShift Cluster.
 
+
 ## Sections
 
 1. [Examples](examples)
