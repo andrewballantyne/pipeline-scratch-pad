@@ -1,4 +1,4 @@
-apiVersion: tekton.dev/v1alpha1
+apiVersion: triggers.tekton.dev/v1alpha1
 kind: TriggerBinding
 metadata:
   name: generic-git
@@ -11,7 +11,7 @@ spec:
     - name: contenttype
       value: $(header.Content-Type)
 ---
-apiVersion: tekton.dev/v1alpha1
+apiVersion: triggers.tekton.dev/v1alpha1
 kind: TriggerTemplate
 metadata:
   name: pipeline-template
@@ -43,19 +43,19 @@ spec:
           - name: reference
             value: "$(params.message) ($(params.gitrevision))"
 ---
-apiVersion: tekton.dev/v1alpha1
+apiVersion: triggers.tekton.dev/v1alpha1
 kind: EventListener
 metadata:
   name: event-listener
 spec:
   serviceAccountName: pipeline
   triggers:
-    - binding:
-        name: generic-git
+    - bindings:
+        - name: generic-git
       template:
         name: pipeline-template
 ---
-apiVersion: tekton.dev/v1alpha1
+apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
   name: simple-pipeline
@@ -79,19 +79,18 @@ spec:
         - name: reference
           value: $(params.reference)
 ---
-apiVersion: tekton.dev/v1alpha1
+apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   name: echo-params-for-event
 spec:
-  inputs:
-    params:
-      - name: url
-        description: The url of the repo
-      - name: content-type
-        description: The content type of the event
-      - name: reference
-        description: The reference for this commit trigger
+  params:
+    - name: url
+      description: The url of the repo
+    - name: content-type
+      description: The content type of the event
+    - name: reference
+      description: The reference for this commit trigger
   steps:
     - name: event-source
       image: ubuntu

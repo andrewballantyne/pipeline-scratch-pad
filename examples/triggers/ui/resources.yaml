@@ -1,22 +1,23 @@
-apiVersion: triggers.tekton.dev/v1alpha1
-kind: TriggerBinding
-metadata:
-  name: github
-spec:
-  params:
-    - name: git-revision
-      value: $(body.head_commit.id)
-    - name: git-commit-message
-      value: $(body.head_commit.message)
-    - name: git-repo-url
-      value: $(body.repository.url)
-    - name: git-repo-name
-      value: $(body.repository.name)
-    - name: content-type
-      value: $(header.content-type)
-    - name: pusher-name
-      value: $(body.head_commit.author.name)
----
+# uncomment if you want to use a custom trigger binding instead of the cluster one
+#apiVersion: triggers.tekton.dev/v1alpha1
+#kind: TriggerBinding
+#metadata:
+#  name: github
+#spec:
+#  params:
+#    - name: git-revision
+#      value: $(body.head_commit.id)
+#    - name: git-commit-message
+#      value: $(body.head_commit.message)
+#    - name: git-repo-url
+#      value: $(body.repository.url)
+#    - name: git-repo-name
+#      value: $(body.repository.name)
+#    - name: content-type
+#      value: $(header.content-type)
+#    - name: pusher-name
+#      value: $(body.head_commit.author.name)
+#---
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
