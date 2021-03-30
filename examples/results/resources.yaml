@@ -1,0 +1,48 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: results-example
+spec:
+  params:
+    - name: echo-value
+      description: The value to echo out
+      default: pipeline echo value
+  tasks:
+    - name: echo
+      taskRef:
+        name: echo-result-task
+      params:
+        - name: echo-value-for-task
+          value: "$(params.echo-value)"
+  results:
+    - name: result
+      description: the echo result
+      value: $(tasks.echo.results.echo-result)
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: echo-result-task
+spec:
+  params:
+    - name: echo-value-for-task
+      description: The value to echo out
+      default: this is not the param you're looking for
+  results:
+    - name: echo-result
+      description: the result of what was echo'ed
+  steps:
+    - name: echo
+      image: ubuntu
+      command:
+        - echo
+      args:
+        - "$(params.echo-value-for-task)"
+    - name: update-result
+      image: alpine
+      env:
+        - name: VAL1
+          value: "$(params.echo-value-for-task)"
+      command: [ "/bin/sh", "-c" ]
+      args:
+        - echo -n $(VAL1) | tee $(results.echo-result.path);
