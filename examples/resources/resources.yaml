@@ -1,0 +1,192 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: pull-and-create-image
+spec:
+  params:
+    - name: username
+      description: The username to log the request against
+    - name: branch
+      description: "The branch within' the source code"
+  resources:
+    outputs:
+      - name: source-image
+        type: image
+  steps:
+    - name: manage-credentials
+      image: ubuntu
+      command:
+        - echo
+      args:
+        - "Logging in on behalf of $(params.username).\n\nUsername: kube:admin\nPassword: *********\n\nCredentials verified successfully."
+    - name: pull-repo
+      image: ubuntu
+      command:
+        - echo
+      args:
+        - "git clone $(outputs.resources.source-image.url)"
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: build
+spec:
+  resources:
+    inputs:
+      - name: source-image
+        type: image
+  steps:
+    - name: install-dependencies
+      image: ubuntu
+      command:
+        - echo
+      args:
+        - "npm install"
+    - name: build-source
+      image: ubuntu
+      command:
+        - echo
+      args:
+        - "npm build"
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: validation
+spec:
+  steps:
+    - name: unit-tests
+      image: ubuntu
+      command:
+        - echo
+      args:
+        - "npm test"
+    - name: lint
+      image: ubuntu
+      command:
+        - echo
+      args:
+        - "npm lint"
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: e2e
+spec:
+  params:
+    - name: max-timeout
+      description: How long (in ms) to wait during network related e2e tests
+      default: "15000"
+  steps:
+    - name: execute
+      image: ubuntu
+      command:
+        - echo
+      args:
+        - "Max timeout: $(params.max-timeout)ms\n\nRunning tests...\nTests passed successfully."
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: analyze
+spec:
+  steps:
+    - name: circular-dependency-check
+      image: ubuntu
+      command:
+        - echo
+      args:
+        - "npm run madge"
+    - name: bundle-size-check
+      image: ubuntu
+      command:
+        - echo
+      args:
+        - "npm run check-bundle-size"
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: deploy
+spec:
+  resources:
+    inputs:
+      - name: image
+        type: image
+  steps:
+    - name: deploy
+      image: ubuntu
+      command:
+        - echo
+      args:
+        - "oc apply -f $(inputs.resources.image.url)"
+---
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: app
+spec:
+  params:
+    - name: username
+      description: Executed by user
+      default: anonymous
+    - name: branch
+      description: The branch to build
+    - name: max-e2e-timeout
+      description: Max timeout for e2e network tests
+      default: "300000"
+  resources:
+    - name: source
+      type: git
+    - name: image
+      type: image
+  tasks:
+    - name: pull
+      taskRef:
+        name: pull-and-create-image
+      params:
+        - name: username
+          value: "$(params.username)"
+        - name: branch
+          value: "$(params.branch)"
+      resources:
+        outputs:
+          - name: source-image
+            resource: image
+    - name: build
+      taskRef:
+        name: build
+      resources:
+        inputs:
+          - name: source-image
+            resource: source
+      runAfter:
+        - pull
+    - name: sanity
+      taskRef:
+        name: validation
+      runAfter:
+        - build
+    - name: analyze
+      taskRef:
+        name: analyze
+      runAfter:
+        - build
+    - name: e2e
+      taskRef:
+        name: e2e
+      params:
+        - name: max-timeout
+          value: "$(params.max-e2e-timeout)"
+      runAfter:
+        - sanity
+        - analyze
+    - name: deploy
+      taskRef:
+        name: deploy
+      resources:
+        inputs:
+          - name: image
+            resource: image
+      runAfter:
+        - e2e
