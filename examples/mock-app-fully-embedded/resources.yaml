@@ -1,0 +1,67 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: mock-app-embedded-pipeline
+spec:
+  tasks:
+    - name: install-deps
+      taskSpec:
+        steps:
+          - name: install
+            image: ubuntu
+            command:
+              - echo
+            args:
+              - "Installing dependencies...\n\nDependencies installed successfully."
+    - name: code-sanity
+      taskSpec:
+        steps:
+          - name: startup
+            image: ubuntu
+            command:
+              - echo
+            args:
+              - "Running Linter and Tests"
+          - name: lint-errors
+            image: ubuntu
+            command:
+              - echo
+            args:
+              - "0 Lint Errors"
+          - name: test-status
+            image: ubuntu
+            command:
+              - echo
+            args:
+              - "0 Test Failures"
+          - name: coverage-report
+            image: ubuntu
+            command:
+              - echo
+            args:
+              - "Exporting Test Coverage Report...\n\nCoverage report can be found in __coverage__"
+      runAfter:
+        - install-deps
+    - name: compile
+      taskSpec:
+        steps:
+          - name: build
+            image: ubuntu
+            command:
+              - echo
+            args:
+              - "Compiling code and producing dist folder...\n\nFolder public/dist created"
+      runAfter:
+        - install-deps
+    - name: e2e-tests
+      taskSpec:
+        steps:
+          - name: status
+            image: ubuntu
+            command:
+              - echo
+            args:
+              - "Running end-to-end tests...\n\nAll tests pass"
+      runAfter:
+        - code-sanity
+        - compile
