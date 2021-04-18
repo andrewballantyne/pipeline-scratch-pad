@@ -1,13 +1,12 @@
-apiVersion: tekton.dev/v1alpha1
+apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   name: echo-task
 spec:
-  inputs:
-    params:
-      - name: echo-value-for-task
-        description: The value to echo out
-        default: this is not the param you're looking for
+  params:
+    - name: echo-value-for-task
+      description: The value to echo out
+      default: this is not the param you're looking for
   steps:
     - name: echo
       image: ubuntu
