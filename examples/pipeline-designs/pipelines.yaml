@@ -1,0 +1,582 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: straight-line
+spec:
+  tasks:
+    - name: task-1
+      taskRef:
+        name: default-task
+    - name: task-2
+      taskRef:
+        name: default-task
+      runAfter:
+        - task-1
+    - name: task-3
+      taskRef:
+        name: default-task
+      runAfter:
+        - task-2
+
+---
+
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: parallel-open-to-serial
+spec:
+  tasks:
+    - name: task-1
+      taskRef:
+        name: default-task
+    - name: task-2
+      taskRef:
+        name: default-task
+    - name: task-3
+      taskRef:
+        name: default-task
+      runAfter:
+        - task-1
+        - task-2
+    - name: task-4
+      taskRef:
+        name: default-task
+      runAfter:
+        - task-3
+
+---
+
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: long-running-parallel
+spec:
+  tasks:
+    - name: task-1
+      taskRef:
+        name: default-task
+    - name: task-2
+      taskRef:
+        name: default-task
+      runAfter:
+        - task-1
+    - name: task-3
+      taskRef:
+        name: default-task
+      runAfter:
+        - task-1
+    - name: task-4
+      taskRef:
+        name: default-task
+      runAfter:
+        - task-3
+    - name: task-5
+      taskRef:
+        name: default-task
+      runAfter:
+        - task-4
+    - name: task-6
+      taskRef:
+        name: default-task
+      runAfter:
+        - task-5
+    - name: task-7
+      taskRef:
+        name: default-task
+      runAfter:
+        - task-2
+        - task-6
+
+---
+
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: parallel-serial-parallel
+spec:
+  tasks:
+    - name: task-1
+      taskRef:
+        name: default-task
+    - name: task-2
+      taskRef:
+        name: default-task
+    - name: task-3
+      taskRef:
+        name: default-task
+      runAfter:
+        - task-1
+        - task-2
+    - name: task-4
+      taskRef:
+        name: default-task
+      runAfter:
+        - task-3
+    - name: task-5
+      taskRef:
+        name: default-task
+      runAfter:
+        - task-3
+
+---
+
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: parallel-parallel
+spec:
+  tasks:
+    - name: task-1
+      taskRef:
+        name: default-task
+    - name: task-2
+      taskRef:
+        name: default-task
+    - name: task-3
+      taskRef:
+        name: default-task
+      runAfter:
+        - task-1
+        - task-2
+    - name: task-4
+      taskRef:
+        name: default-task
+      runAfter:
+        - task-1
+        - task-2
+
+---
+
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: large-parallel-to-small-parallel
+spec:
+  tasks:
+    - name: task-1a
+      taskRef:
+        name: default-task
+    - name: task-1b
+      taskRef:
+        name: default-task
+    - name: task-1c
+      taskRef:
+        name: default-task
+    - name: task-1d
+      taskRef:
+        name: default-task
+    - name: task-1e
+      taskRef:
+        name: default-task
+    - name: task-1f
+      taskRef:
+        name: default-task
+    - name: task-1g
+      taskRef:
+        name: default-task
+    - name: task-1h
+      taskRef:
+        name: default-task
+    - name: task-2a
+      taskRef:
+        name: default-task
+      runAfter:
+        - task-1a
+        - task-1b
+        - task-1c
+        - task-1d
+        - task-1e
+        - task-1f
+        - task-1g
+        - task-1h
+    - name: task-2b
+      taskRef:
+        name: default-task
+      runAfter:
+        - task-1a
+        - task-1b
+        - task-1c
+        - task-1d
+        - task-1e
+        - task-1f
+        - task-1g
+        - task-1h
+
+---
+
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: complex-run-after
+spec:
+  tasks:
+    - name: task-1
+      taskRef:
+        name: default-task
+    - name: task-2
+      taskRef:
+        name: default-task
+      runAfter:
+        - task-1
+    - name: task-3
+      taskRef:
+        name: default-task
+      runAfter:
+        - task-2
+        - task-4
+    - name: task-4
+      taskRef:
+        name: default-task
+      runAfter:
+        - task-1
+    - name: task-5
+      taskRef:
+        name: default-task
+      runAfter:
+        - task-1
+    - name: task-6
+      taskRef:
+        name: default-task
+      runAfter:
+        - task-2
+        - task-4
+    - name: task-7
+      taskRef:
+        name: default-task
+      runAfter:
+        - task-4
+        - task-5
+
+---
+
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: parallel-parallel-parallel
+spec:
+  tasks:
+    - name: task-1
+      taskRef:
+        name: default-task
+    - name: task-2
+      taskRef:
+        name: default-task
+    - name: task-3
+      taskRef:
+        name: default-task
+      runAfter:
+        - task-1
+        - task-2
+    - name: task-4
+      taskRef:
+        name: default-task
+      runAfter:
+        - task-1
+        - task-2
+    - name: task-5
+      taskRef:
+        name: default-task
+      runAfter:
+        - task-3
+        - task-4
+    - name: task-6
+      taskRef:
+        name: default-task
+      runAfter:
+        - task-3
+        - task-4
+
+---
+
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: odc-5100-graph
+spec:
+  tasks:
+    - name: source-clone
+      taskRef:
+        kind: ClusterKind
+        name: kn
+    - name: code-analysis
+      taskRef:
+        kind: ClusterKind
+        name: kn
+      runAfter:
+        - source-clone
+    - name: dependency-something
+      taskRef:
+        kind: ClusterKind
+        name: kn
+      runAfter:
+        - source-clone
+    - name: unit-tests
+      taskRef:
+        kind: ClusterKind
+        name: kn
+      runAfter:
+        - source-clone
+    - name: release-app
+      taskRef:
+        kind: ClusterKind
+        name: kn
+      runAfter:
+        - code-analysis
+        - dependency-something
+        - unit-tests
+    - name: build-image
+      taskRef:
+        kind: ClusterKind
+        name: kn
+      runAfter:
+        - release-app
+    - name: config-clone
+      taskRef:
+        kind: ClusterKind
+        name: kn
+      runAfter:
+        - release-app
+    - name: tests-clone
+      taskRef:
+        kind: ClusterKind
+        name: kn
+      runAfter:
+        - release-app
+    - name: deploy-dev
+      taskRef:
+        kind: ClusterKind
+        name: kn
+      runAfter:
+        - build-image
+        - config-clone
+        - tests-clone
+    - name: int-test
+      taskRef:
+        kind: ClusterKind
+        name: kn
+      runAfter:
+        - deploy-dev
+    - name: perf-test
+      taskRef:
+        kind: ClusterKind
+        name: kn
+      runAfter:
+        - int-test
+
+---
+
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: pipeline-cicd
+spec:
+  finally:
+    - name: end-notify
+      taskRef:
+        kind: Task
+        name: default-task
+  tasks:
+    - name: fetch-repository
+      taskRef:
+        kind: Task
+        name: default-task
+    - name: begin-notify
+      runAfter:
+        - fetch-repository
+      taskRef:
+        kind: Task
+        name: default-task
+    - name: what-changed
+      runAfter:
+        - fetch-repository
+      taskRef:
+        kind: Task
+        name: default-task
+    - name: import-pgp-keys
+      runAfter:
+        - what-changed
+      taskRef:
+        kind: Task
+        name: default-task
+    - name: should-compile
+      runAfter:
+        #- unshallow-repo
+        #- fetch-repository
+        - what-changed
+      taskRef:
+        kind: Task
+        name: default-task
+    - name: compile-site
+      runAfter:
+        - should-compile
+      taskRef:
+        kind: Task
+        name: default-task
+
+    #- name: debug-pipeline
+    #  taskRef:
+    #    name: debug
+    #  workspaces:
+    #    - name: source
+    #      workspace: shared-workspace
+    #  runAfter:
+    #    - fetch-repository
+
+    - name: build-image
+      runAfter:
+        - compile-site
+      taskRef:
+        kind: Task
+        name: default-task
+    - name: gen-preview
+      runAfter:
+        - build-image
+        - import-pgp-keys
+      taskRef:
+        kind: Task
+        name: default-task
+    - name: check-policy
+      runAfter:
+        - gen-preview
+      taskRef:
+        kind: Task
+        name: default-task
+    - name: check-deprecation
+      runAfter:
+        - gen-preview
+      taskRef:
+        kind: Task
+        name: default-task
+    - name: deploy-preview
+      runAfter:
+        - check-policy
+        - check-deprecation
+      taskRef:
+        kind: Task
+        name: default-task
+    - name: add-pr-comment
+      runAfter:
+        - deploy-preview
+      taskRef:
+        kind: Task
+        name: default-task
+    - name: prune-preview
+      runAfter:
+        #- unshallow-repo
+        #- fetch-repository
+        - what-changed
+      taskRef:
+        kind: Task
+        name: default-task
+    - name: prune-images
+      runAfter:
+        #- unshallow-repo
+        #- fetch-repository
+        - what-changed
+      taskRef:
+        kind: Task
+        name: default-task
+    - name: send-dev-pr
+      runAfter:
+        - import-pgp-keys
+        - build-image
+        - what-changed
+      taskRef:
+        kind: Task
+        name: default-task
+
+    ## The following steps are not required if were to use ArgoCD
+
+    - name: get-deploy-target
+      runAfter:
+        #- unshallow-repo
+        #- check-manifest-changed
+        - what-changed
+      taskRef:
+        kind: Task
+        name: default-task
+    - name: deploy-app
+      runAfter:
+        - import-pgp-keys
+        - get-deploy-target
+      taskRef:
+        kind: Task
+        name: default-task
+
+---
+
+# [VPN] https://gitlab.cee.redhat.com/tekton/plumbing/-/blob/master/ci/pipelines/acceptance-tests.yaml
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: acceptance-tests
+spec:
+  tasks:
+    - name: generate-ids
+      taskRef:
+        kind: Task
+        name: default-task
+    - name: provision
+      taskRef:
+        kind: Task
+        name: default-task
+      runAfter:
+        - generate-ids
+    - name: clone-pluming
+      taskRef:
+        kind: Task
+        name: default-task
+    - name: clone-related-something
+      taskRef:
+        kind: Task
+        name: default-task
+    - name: clone-tutorials
+      taskRef:
+        kind: Task
+        name: default-task
+    - name: setup-test-framework
+      taskRef:
+        kind: Task
+        name: default-task
+      runAfter:
+        - provision
+        - clone-pluming
+        - clone-related-something
+        - clone-tutorials
+    - name: setup-p12n-tests
+      taskRef:
+        kind: Task
+        name: default-task
+      runAfter:
+        - setup-test-framework
+    - name: pipelines-sanity
+      taskRef:
+        kind: Task
+        name: default-task
+      runAfter:
+        - setup-p12n-tests
+    - name: metrics-accumulated
+      taskRef:
+        kind: Task
+        name: default-task
+      runAfter:
+        - pipelines-sanity
+    - name: release-tests
+      taskRef:
+        kind: Task
+        name: default-task
+      runAfter:
+        - pipelines-sanity
+    - name: releases-tests-complex
+      taskRef:
+        kind: Task
+        name: default-task
+      runAfter:
+        - pipelines-sanity
+    - name: tutorial-tests
+      taskRef:
+        kind: Task
+        name: default-task
+      runAfter:
+        - pipelines-sanity
+
